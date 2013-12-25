@@ -1,0 +1,90 @@
+<html>
+<head>
+  <meta charset="utf-8">  
+  <title>Custom Sprite</title>
+  <style>
+    body {
+      background-color: #ffffff;
+      border: 0px;
+      margin: 0px;
+      padding: 0px;
+    }
+	</style>  
+</head>
+
+<body>
+  <header> </header>
+  <script src="three.min.js"></script>
+  <script>
+  // Grab the screen size 
+  var WIDTH = window.innerWidth, HEIGHT = window.innerHeight;
+  
+  // Create Renderer
+  var renderer = new THREE.WebGLRenderer();
+  renderer.setSize(WIDTH, HEIGHT);
+  // Set the background color of the scene.
+  renderer.setClearColor(new THREE.Color(0xeeeeee));
+  // Add renderer to document
+  document.body.appendChild(renderer.domElement);
+
+  // Make the camera 
+  var camera = new THREE.OrthographicCamera( 0, WIDTH, 0, HEIGHT, 1, -1);  
+
+  // Create the sprite 
+  var sprite = makeSprite(64,64,'TestImage.png');
+  sprite.position.set((WIDTH/2) - 32, (HEIGHT/2) - 32,0);
+
+  // Make the scene
+  var scene = new THREE.Scene();
+  scene.add(sprite);
+
+  /** Draw scene **/
+  function animate(){
+    // Draw the sprite
+    renderer.render(scene, camera);
+  }
+
+  /** Make a sprite **/
+  function makeSprite(width, height, texPath){
+    // Load the texture file 
+    var texture = THREE.ImageUtils.loadTexture(texPath);
+    // Make a new basic material and give it the texture 
+    var mat = new THREE.MeshBasicMaterial({map:texture});
+    // Must set this to true or the texture will not draw correctly if there is alpha 
+    mat.transparent = true;
+    // Make a new blank geometry 
+    var geom = new THREE.Geometry(); 
+    
+    // Add verticies to the geometry 
+    geom.vertices.push(new THREE.Vector3(0,0,0));
+    geom.vertices.push(new THREE.Vector3(0,height,0));
+    geom.vertices.push(new THREE.Vector3(width,height,0));
+    geom.vertices.push(new THREE.Vector3(width,0,0));
+    
+    // Set the geometry faces 
+    geom.faces.push(new THREE.Face3(0,1,2));
+    geom.faces.push(new THREE.Face3(2,3,0));
+
+    // Set the UV's for the faces 
+    geom.faceVertexUvs[0].push([
+      new THREE.Vector2(0,1),
+      new THREE.Vector2(0,0),
+      new THREE.Vector2(1,0)]);
+    geom.faceVertexUvs[0].push([
+      new THREE.Vector2(1,0),
+      new THREE.Vector2(1,1),
+      new THREE.Vector2(0,1)]);
+    geom.faces[0].normal.set(0,0,1); 
+
+    // Make the mesh 
+    return new THREE.Mesh(geom, mat);
+  }
+
+  // Enter rendering loop
+  setInterval(animate, 1000 / 20);
+
+  </script>
+  <footer> </footer>
+</body>
+</html>
+
